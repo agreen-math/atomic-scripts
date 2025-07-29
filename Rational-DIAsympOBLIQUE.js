@@ -11,7 +11,7 @@ function randomValue(min, max, decimal_places){
 }
 
 function getA(){
-  return randomItem([1,2,3,4,5,6,7,8,9]);
+  return randomItem([6,7]);
 }
 
 function getB(){
@@ -19,7 +19,7 @@ function getB(){
 }
 
 function getC(){
-  return randomItem([1,2]);
+  return randomItem([1]);
 }
 
 function getD(){
@@ -45,18 +45,20 @@ for(let i=0; i<rows; i++){
   const c=getC();
   const d=getD();
 
-  const Yint=(b^2*d)/(a*c*d);
+  const YintNum=b*b;
+  const YintDenom=a*c;
+  const Yint=`\\frac{${YintNum}}{${YintDenom}}`
+
+  const asympC=2*d+1;
   
   const equation=getEQ(a,b,c,d);
   const domain=`"(-\\infty,-${d})\\cup(-${d},-${c})\\cup(-${c},\\infty)"`
   const VA=`"-${c},-${d}"`
   const holes=`none`
-  const HOAsymp=`\\frac{1}{${a}}x+idk`
+  const HOAsymp=`\\frac{1}{${a}}x-\\frac{${asympC}}{${a}}`
   const Xint=`"${b},-${b},${d}"`
   const ineq=`"(-${d},-${b})\\cup(-${c},${b})\\cup(${d},\\infty)"`
   const negLim=`-\\infty`
   const posLim=`\\infty`
   addRow([equation,domain,VA,holes,HOAsymp,Xint,Yint,ineq,negLim,posLim]);
 }
-
-

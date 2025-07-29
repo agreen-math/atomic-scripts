@@ -29,7 +29,7 @@ const rows = 50;
 for(let i=0; i<rows; i++){
   const a=getA();
   const b=getB();
-  const c=a^2*b;
+  const c=(a**2)*b;
   const d=a*b;
   
   const equation=getEQ(a,b,c);
