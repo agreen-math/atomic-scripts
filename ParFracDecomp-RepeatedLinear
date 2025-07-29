@@ -38,20 +38,9 @@ function texPoly(coefficients) {
   return terms.join("");
 }
 
-function getA(){ return randomItem([-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7,8,9,10]); }
-function getB(){ return randomItem([-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7,8,9,10]); }
-function getM(){ return randomItem([-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7,8,9,10]); }
-function getN(m) {
-  let n;
-  do {
-    n = randomItem([-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7,8,9,10]);
-  } while (m === n);
-  return n;
-}
-
-function isInteger(x) {
-  return Number.isInteger(x);
-}
+function getA(){ return randomItem([-5,-4,-3,-2,-1,1,2,3,4,5]); }
+function getB(){ return randomItem([-20,-15,-10,-5,0,5,10,15,20]); }
+function getR(){ return randomItem([-5,-4,-3,-2,-1,1,2,3,4,5]); }
 
 setColumns(["expression", "decomposed"]);
 seed(42);
@@ -59,29 +48,23 @@ seed(42);
 const rows = 50;
 
 for (let i = 0; i < rows; i++) {
-  let a, b, m, n, A, B;
+  let a, b, r, A, B;
+
   do {
     a = getA();
     b = getB();
-    m = getM();
-    n = getN(m);
+    r = getR();
 
-    const den = n - m;
-    const numA = b - a * m;
+    A = a;
+    B = b - a * r;
+  } while (!Number.isInteger(B) || A === 0 || B === 0);
 
-    A = numA / den;
-    B = a - A;
-  } while (
-    !isInteger(A) || !isInteger(B) ||
-    A === 0 || B === 0
-  );
+  const numerator = texPoly([a, b]);
+  const denom = texPoly([1, 2 * r, r * r]); // only for expression display
+  const factor = texPoly([1, r]);
 
-  const num = texPoly([a, b]);
-  const den1 = texPoly([1, m]);
-  const den2 = texPoly([1, n]);
-
-  const expression = `"\\frac{${num}}{(${den1})(${den2})}"`;
-  const decomposed = `"\\frac{${A}}{${den1}}+\\frac{${B}}{${den2}}"`;
+  const expression = `"\\frac{${numerator}}{(${factor})^2}"`;
+  const decomposed = `"\\frac{${A}}{${factor}} + \\frac{${B}}{(${factor})^2}"`;
 
   addRow([expression, decomposed]);
 }
