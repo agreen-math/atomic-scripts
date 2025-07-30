@@ -1,3 +1,15 @@
+function round(value, decimal_places){
+  return value.toFixed(decimal_places);
+}
+
+function randomValue(min, max, decimal_places){
+  return round(min + getRandom()*(max-min), decimal_places);
+
+}function randomItem(list){
+  var selection = randomValue(0, list.length-1, 0);
+  return list[selection];
+}
+
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -46,9 +58,9 @@ function generateExpansionProblem() {
         const part2 = `${power2}${cleanBaseLatex(base, var2)}`;
         const part3 = `- ${cleanBaseLatex(base, var3)}`;
 
-        answer = `$${part1} + ${part2} ${part3}$`;
+        answer = `${part1} + ${part2} ${part3}`;
     } else {
-        const coef = getRandomInt(2, 9);
+        const coef = randomItem([5,6,7]);
         const expr = `${coef}${formatPower(var1,power1)}${formatPower(var2,power2)}`;
         expression = cleanBaseLatex(base, expr);
 

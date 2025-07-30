@@ -32,7 +32,7 @@ for(let i=0; i<rows; i++){
   const c=(a**2)*b;
   const d=a*b;
   
-  const equation=getEQ(a,b,c);
+  const equation=getEQ(a,b,c,d);
   const solutions="none"
   addRow([equation,solutions]);
 }
