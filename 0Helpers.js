@@ -65,3 +65,35 @@ function texFrac(cnum, cdenom) {
     return `\\frac{${num}}{${denom}}`;
   }
 }
+
+function areRelativelyPrime(a, b) {
+    return gcd(a, b) === 1;
+}
+
+function parseLatexFraction(latex) {
+    const match = latex.match(/(-?)\\frac{(\d+)}{(\d+)}/);
+    if (!match) return null;
+
+    const sign = match[1] === '-' ? -1 : 1;
+    const numerator = parseInt(match[2], 10);
+    const denominator = parseInt(match[3], 10);
+
+    return { numerator: sign * numerator, denominator };
+}
+
+function formatLatexFraction(a, b) {
+    const sign = a * b < 0 ? '-' : '';
+    return `${sign}\\frac{${Math.abs(a)}}{${Math.abs(b)}}`;
+}
+
+function getOpposite(latex) {
+    const frac = parseLatexFraction(latex);
+    if (!frac) return '';
+    return formatLatexFraction(-frac.numerator, frac.denominator);
+}
+
+function getReciprocal(latex) {
+    const frac = parseLatexFraction(latex);
+    if (!frac || frac.numerator === 0) return '';
+    return formatLatexFraction(frac.denominator, frac.numerator);
+}
