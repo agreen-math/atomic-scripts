@@ -18,18 +18,5 @@ function getC(){
   return randomItem([1,2,3,4,5,6,7,8,9]);
 }
 
-setColumns(["a","b","c","s1","s2"]);
-seed(42);
-
-const rows = 50;
-
-for(let i=0; i<rows; i++){
-  const a=getA();
-  const c=getC();
-  const b=-1*(a*c+1);
-  const s1=`-\\frac{1}{${a}}`;
-  const s2=c;
-  addRow([a,b,c,s1,s2]);
-}
 
 
