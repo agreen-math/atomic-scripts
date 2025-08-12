@@ -97,3 +97,30 @@ function getReciprocal(latex) {
     if (!frac || frac.numerator === 0) return '';
     return formatLatexFraction(frac.denominator, frac.numerator);
 }
+
+/**
+ * Generates a random integer between min and max (inclusive).
+ * @param {number} max - The maximum value.
+ * @returns {number} A random integer.
+ */
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * Converts degrees to radians.
+ * @param {number} degrees - The angle in degrees.
+ * @returns {number} The angle in radians.
+ */
+function degToRad(degrees) {
+  return degrees * (Math.PI / 180);
+}
+
+/**
+ * Converts radians to degrees.
+ * @param {number} radians - The angle in radians.
+ * @returns {number} The angle in degrees.
+ */
+function radToDeg(radians) {
+  return radians * (180 / Math.PI);
+}
