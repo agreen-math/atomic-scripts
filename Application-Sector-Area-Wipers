@@ -1,0 +1,45 @@
+/**
+ * This script generates a CSV of application problems for finding the area of
+ * a circle sector, using the context of a car's windshield wiper.
+ * The angle is given in degrees to assess whether students remember to
+ * convert it to radians for the area formula: A = (1/2)r^2 * θ.
+ */
+
+// --- Helper Functions ---
+
+/**
+ * Generates a random integer between min and max (inclusive).
+ */
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// --- Main Script ---
+
+setColumns([
+    "blade_length_inches",
+    "angle_degrees",
+    "area_sq_inches"
+]);
+
+const rows = 50;
+
+for (let i = 0; i < rows; i++) {
+  // 1. Generate a random blade length (radius) and angle of rotation.
+  const blade_length_inches = getRandomInt(12, 26);
+  const angle_degrees = getRandomInt(90, 150);
+
+  // 2. Calculate the sector area.
+  // First, convert the angle from degrees to radians.
+  const angle_radians = angle_degrees * (Math.PI / 180);
+
+  // Then, use the sector area formula: A = (1/2) * r^2 * θ
+  const area = 0.5 * Math.pow(blade_length_inches, 2) * angle_radians;
+
+  // 3. Add the problem data and formatted answer to the CSV.
+  addRow([
+    blade_length_inches.toString(),
+    angle_degrees.toString(),
+    area.toFixed(2)
+  ]);
+}
