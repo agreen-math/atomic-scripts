@@ -1,0 +1,45 @@
+/**
+ * This script generates a CSV of application problems for linear and angular speed,
+ * using the context of a wind turbine. Students are given the blade length and
+ * angular speed in RPM and must calculate the linear speed of the blade tip.
+ */
+
+// --- Helper Functions ---
+
+/**
+ * Generates a random integer between min and max (inclusive).
+ */
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// --- Main Script ---
+
+setColumns([
+    "blade_length_meters",
+    "angular_speed_rpm",
+    "linear_speed_mps"
+]);
+
+const rows = 50;
+
+for (let i = 0; i < rows; i++) {
+  // 1. Generate a random blade length (radius) and angular speed in RPM.
+  const blade_length_meters = getRandomInt(40, 90); // Radius in meters
+  const angular_speed_rpm = getRandomInt(10, 20);   // Angular speed in revolutions per minute
+
+  // 2. Calculate the linear speed (v = r * ω).
+  // First, convert angular speed from RPM to radians per second.
+  // ω = (RPM * 2π) / 60
+  const angular_speed_rad_per_sec = (angular_speed_rpm * 2 * Math.PI) / 60;
+
+  // Now, calculate the linear speed.
+  const linear_speed_mps = blade_length_meters * angular_speed_rad_per_sec;
+
+  // 3. Add the problem data and formatted answer to the CSV.
+  addRow([
+    blade_length_meters.toString(),
+    angular_speed_rpm.toString(),
+    linear_speed_mps.toFixed(2)
+  ]);
+}
