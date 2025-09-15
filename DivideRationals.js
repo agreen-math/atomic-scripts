@@ -1,109 +1,129 @@
-function round(value, decimal_places){
-  return value.toFixed(decimal_places);
+/**
+ * This script generates a CSV of problems for dividing and simplifying
+ * rational expressions. Each problem is constructed to have a common binomial
+ * factor that can be canceled after inverting the second fraction.
+ */
+
+// --- Helper Functions ---
+
+/**
+ * Generates a random integer between min and max (inclusive).
+ */
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function randomValue(min, max, decimal_places){
-  return round(min + getRandom()*(max-min), decimal_places);
-
-}function randomItem(list){
-  var selection = randomValue(0, list.length-1, 0);
-  return list[selection];
-}
-
-function texPoly(coefficients) {
-  let terms = [];
-
-  for (let i = 0; i < coefficients.length; i++) {
-    const coef = coefficients[i];
-    const degree = coefficients.length - 1 - i;
-
-    if (coef === 0) continue; // skip zero terms
-
-    // Sign prefix
-    const sign = coef > 0 ? (terms.length > 0 ? " + " : "") : " - ";
-
-    // Absolute value for formatting
-    const absCoef = Math.abs(coef);
-
-    // Term content
-    let term = "";
-    if (degree === 0) {
-      term = `${absCoef}`;
-    } else if (degree === 1) {
-      term = (absCoef === 1 ? "" : `${absCoef}`) + "x";
-    } else {
-      term = (absCoef === 1 ? "" : `${absCoef}`) + `x^${degree}`;
-    }
-
-    terms.push((coef < 0 ? sign + term : sign.trim() + term));
+/**
+ * Calculates the greatest common divisor of two numbers.
+ */
+function gcd(a, b) {
+  a = Math.abs(a);
+  b = Math.abs(b);
+  while (b) {
+    [a, b] = [b, a % b];
   }
-
-  return terms.join("");
+  return a;
 }
 
-
-function getA(){
-  return randomItem([2,3,4,5,6,7,8,9]);
+/**
+ * Formats a linear expression ax+b into a clean string.
+ * @param {number} a The coefficient of x.
+ * @param {number} b The constant term.
+ * @returns {string} The formatted linear expression.
+ */
+function formatLinear(a, b) {
+  let parts = [];
+  if (a !== 0) {
+    if (a === 1) parts.push('x');
+    else if (a === -1) parts.push('-x');
+    else parts.push(`${a}x`);
+  }
+  if (b !== 0) {
+    // Add a plus sign only if it's not the first term.
+    const sign = (b > 0 && parts.length > 0) ? '+' : '';
+    parts.push(`${sign}${b}`);
+  }
+  if (parts.length === 0) return '0';
+  return parts.join('');
 }
 
-function getB(a) {
-  let b;
-  do {
-    b = randomItem([1,2,3,4,5,6,7,8,9]);
-  } while (a === b);
-  return b;
-}
+// --- Main Script ---
 
-function getC(){
-  return randomItem([2,3,4,5,6,7,8,9]);
-}
-
-function getD(c) {
-  let d;
-  do {
-    d = randomItem([1,2,3,4,5,6,7,8,9]);
-  } while (c === d);
-  return d;
-}
-
-function getM(){
-  return randomItem([1,2,3,4,5,6,7,8,9]);
-}
-
-function getN(m) {
-  let n;
-  do {
-    n = randomItem([1,2,3,4,5,6,7,8,9]);
-  } while (n === m);
-  return n;
-}
-
-setColumns(["expression","simplified"]);
-seed(42);
+setColumns(["expression", "simplified", "alt", "alternate2", "alternate3"]);
 
 const rows = 50;
 
-for(let i=0; i<rows; i++){
-  const a=getA();
-  const b=getB();  
-  const c=getC();
-  const d=getD();
-  const m=getM();
-  const n=getN(m);
+for (let i = 0; i < rows; i++) {
+  // 1. Define the common factor (x - r) that will be canceled.
+  const r = getRandomInt(-9, 9);
+  // Define a GCF for the first numerator.
+  const g = getRandomInt(2, 5);
 
-  const A=a;
-  const B=a*n+b;
-  const C=b*n;
+  // 2. First fraction's numerator will be g(x-r).
+  const num1_a = g;
+  const num1_b = -g * r;
 
-  const D=c;
-  const E=c*m+d;
-  const F=d*m;
+  // 3. First fraction's denominator will be (x-c1).
+  let c1;
+  do {
+    c1 = getRandomInt(-9, 9);
+  } while (c1 === r); // Ensure it's different from the canceling factor.
+  const den1_str = formatLinear(1, -c1);
 
-  const num=texPoly([A,B,C]);
-  const denom=texPoly([D,E,F]);
+  // 4. Second fraction's numerator will be (x-r) to allow cancellation.
+  const num2_str = formatLinear(1, -r);
+
+  // 5. Second fraction's denominator will be (ax+b).
+  const den2_a = getRandomInt(1, 9);
+  let den2_b;
   
-  const expression=`"\\frac{${a}x+${b}}{x+${m}}\\div\\frac{${c}x+${d}}{x+${n}}"`
-  const simplified=`"\\frac{${num}}{${denom}}"`
+  // FIX: This loop prevents the final expression from over-simplifying.
+  // The expression simplifies to a constant if (den2_a*x + den2_b) is a multiple
+  // of (x - c1). This happens if den2_b = -den2_a * c1. We prevent that here.
+  do {
+    den2_b = getRandomInt(-9, 9);
+  } while (den2_b === -den2_a * c1);
+  const den2_str = formatLinear(den2_a, den2_b);
 
-  addRow([expression,simplified]);
+  // 6. Format the full expression string.
+  const num1_str = formatLinear(num1_a, num1_b);
+  const expression = `\\frac{${num1_str}}{${den1_str}}\\div\\frac{${num2_str}}{${den2_str}}`;
+
+  // 7. Format the simplified (factored) answer.
+  // After inverting and canceling, the result is g * (den2) / den1.
+  const simplified_num = `${g}(${den2_str})`;
+  const simplified = `\\frac{${simplified_num}}{${den1_str}}`;
+
+  // 8. Format the alternate (distributed) answer.
+  const coeff1 = g * den2_a;
+  const coeff2 = g * den2_b;
+  const alternate_num = formatLinear(coeff1, coeff2);
+  const alternate = `\\frac{${alternate_num}}{${den1_str}}`;
+
+  // 9. Compute alternate2 (factoring out -1 from the numerator if possible).
+  let alternate2_num = alternate_num; // Default to the standard distributed form
+  if (coeff1 < 0 && coeff2 < 0) {
+    alternate2_num = `-${formatLinear(-coeff1, -coeff2)}`;
+  } else if (coeff1 < 0) {
+    alternate2_num = `-${formatLinear(-coeff1, -coeff2)}`;
+  }
+  const alternate2 = `\\frac{${alternate2_num}}{${den1_str}}`;
+
+  // 10. Compute alternate3 (factoring out GCF from the distributed numerator).
+  const gcf = gcd(coeff1, coeff2);
+  let alternate3_num = alternate_num; // Default to standard form
+  if (gcf > 1) {
+    const factored_part = formatLinear(coeff1 / gcf, coeff2 / gcf);
+    alternate3_num = `${gcf}(${factored_part})`;
+  }
+  const alternate3 = `\\frac{${alternate3_num}}{${den1_str}}`;
+
+  // 11. Add the new problem to the CSV.
+  addRow([
+    expression,
+    simplified,
+    alternate,
+    alternate2,
+    alternate3
+  ]);
 }
