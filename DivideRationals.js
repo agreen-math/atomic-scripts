@@ -14,18 +14,6 @@ function getRandomInt(min, max) {
 }
 
 /**
- * Calculates the greatest common divisor of two numbers.
- */
-function gcd(a, b) {
-  a = Math.abs(a);
-  b = Math.abs(b);
-  while (b) {
-    [a, b] = [b, a % b];
-  }
-  return a;
-}
-
-/**
  * Formats a linear expression ax+b into a clean string.
  * @param {number} a The coefficient of x.
  * @param {number} b The constant term.
@@ -39,7 +27,6 @@ function formatLinear(a, b) {
     else parts.push(`${a}x`);
   }
   if (b !== 0) {
-    // Add a plus sign only if it's not the first term.
     const sign = (b > 0 && parts.length > 0) ? '+' : '';
     parts.push(`${sign}${b}`);
   }
@@ -65,9 +52,7 @@ for (let i = 0; i < rows; i++) {
 
   // 3. First fraction's denominator will be (x-c1).
   let c1;
-  do {
-    c1 = getRandomInt(-9, 9);
-  } while (c1 === r); // Ensure it's different from the canceling factor.
+  do { c1 = getRandomInt(-9, 9); } while (c1 === r); // Ensure it's different from the canceling factor.
   const den1_str = formatLinear(1, -c1);
 
   // 4. Second fraction's numerator will be (x-r) to allow cancellation.
@@ -75,14 +60,7 @@ for (let i = 0; i < rows; i++) {
 
   // 5. Second fraction's denominator will be (ax+b).
   const den2_a = getRandomInt(1, 9);
-  let den2_b;
-  
-  // FIX: This loop prevents the final expression from over-simplifying.
-  // The expression simplifies to a constant if (den2_a*x + den2_b) is a multiple
-  // of (x - c1). This happens if den2_b = -den2_a * c1. We prevent that here.
-  do {
-    den2_b = getRandomInt(-9, 9);
-  } while (den2_b === -den2_a * c1);
+  const den2_b = getRandomInt(-9, 9);
   const den2_str = formatLinear(den2_a, den2_b);
 
   // 6. Format the full expression string.
@@ -95,26 +73,39 @@ for (let i = 0; i < rows; i++) {
   const simplified = `\\frac{${simplified_num}}{${den1_str}}`;
 
   // 8. Format the alternate (distributed) answer.
-  const coeff1 = g * den2_a;
-  const coeff2 = g * den2_b;
-  const alternate_num = formatLinear(coeff1, coeff2);
+  const alternate_num = formatLinear(g * den2_a, g * den2_b);
   const alternate = `\\frac{${alternate_num}}{${den1_str}}`;
 
-  // 9. Compute alternate2 (factoring out -1 from the numerator if possible).
-  let alternate2_num = alternate_num; // Default to the standard distributed form
-  if (coeff1 < 0 && coeff2 < 0) {
-    alternate2_num = `-${formatLinear(-coeff1, -coeff2)}`;
-  } else if (coeff1 < 0) {
-    alternate2_num = `-${formatLinear(-coeff1, -coeff2)}`;
+  // 9. Compute alternate2 factoring (e.g., factor out -1 if possible)
+  let alternate2_num = '';
+  // If both coefficients are negative, factor out -1
+  if (g * den2_a < 0 && g * den2_b < 0) {
+    alternate2_num = `-${formatLinear(-g * den2_a, -g * den2_b)}`;
+  } else if (g * den2_a < 0) {
+    // Factor out -1 from the leading coefficient only
+    alternate2_num = `-${formatLinear(-g * den2_a, g * den2_b)}`;
+  } else {
+    // No alternate factoring
+    alternate2_num = alternate_num;
   }
   const alternate2 = `\\frac{${alternate2_num}}{${den1_str}}`;
 
-  // 10. Compute alternate3 (factoring out GCF from the distributed numerator).
-  const gcf = gcd(coeff1, coeff2);
-  let alternate3_num = alternate_num; // Default to standard form
+  // 10. Compute alternate3 factoring (factor out GCF from distributed numerator)
+  function gcd(a, b) {
+    a = Math.abs(a); b = Math.abs(b);
+    while (b) { [a, b] = [b, a % b]; }
+    return a;
+  }
+  const coeff1 = g * den2_a;
+  const coeff2 = g * den2_b;
+  let gcf = gcd(coeff1, coeff2);
+  // Only factor if GCF > 1
+  let alternate3_num;
   if (gcf > 1) {
-    const factored_part = formatLinear(coeff1 / gcf, coeff2 / gcf);
-    alternate3_num = `${gcf}(${factored_part})`;
+    const factored = formatLinear(coeff1 / gcf, coeff2 / gcf);
+    alternate3_num = `${gcf}(${factored})`;
+  } else {
+    alternate3_num = alternate_num;
   }
   const alternate3 = `\\frac{${alternate3_num}}{${den1_str}}`;
 
