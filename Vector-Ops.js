@@ -62,7 +62,7 @@ setColumns(["u", "v", "k", "u-v", "u+kv"]);
 const rows = 50;
 
 for (let i = 0; i < rows; i++) {
-  // 1. Generate random components for vectors u and v, and a scalar k.
+  // 1. Generate random components.
   const u_x = getRandomInt(-10, 10);
   const u_y = getRandomInt(-10, 10);
   const v_x = getRandomInt(-10, 10);
@@ -73,14 +73,16 @@ for (let i = 0; i < rows; i++) {
   const u_formatted = formatVector(u_x, u_y);
   const v_formatted = formatVector(v_x, v_y);
 
-  // 3. Calculate and format u - v.
-  const sub_x = u_x - v_x;
-  const sub_y = u_y - v_y;
+  // 3. Calculate and format u - v. 
+  // (Subtraction implicitly handles types, but Number() is safer).
+  const sub_x = Number(u_x) - Number(v_x);
+  const sub_y = Number(u_y) - Number(v_y);
   const sub_formatted = formatVector(sub_x, sub_y);
 
   // 4. Calculate and format u + kv.
-  const add_x = u_x + (k * v_x);
-  const add_y = u_y + (k * v_y);
+  // FIX: Wrap u_x and u_y in Number() to prevent string concatenation.
+  const add_x = Number(u_x) + (Number(k) * Number(v_x));
+  const add_y = Number(u_y) + (Number(k) * Number(v_y));
   const add_formatted = formatVector(add_x, add_y);
 
   // 5. Add the new problem to the CSV.
